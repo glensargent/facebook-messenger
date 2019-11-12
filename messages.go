@@ -11,8 +11,9 @@ type recipient struct {
 
 // TextMessage is the structure that represents a text only message on messenger
 type TextMessage struct {
-	Recipient recipient `json:"recipient"`
-	Message   textMessageContent
+	MessagingType string    `json:"messaging_type"`
+	Recipient     recipient `json:"recipient"`
+	Message       textMessageContent
 }
 
 type textMessageContent struct {
