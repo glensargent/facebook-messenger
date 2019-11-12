@@ -3,7 +3,6 @@ package messenger
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -26,15 +25,6 @@ type Client struct {
 // New returns a new messenger client
 func New(accessToken, pageID string) Client {
 	return Client{accessToken, pageID}
-}
-
-// NewTextMessage returns a new text message structure
-func (c Client) NewTextMessage(recipientID int, text string) TextMessage {
-	return TextMessage{
-		MessagingType: "UPDATE",
-		Recipient:     recipient{ID: recipientID},
-		Message:       textMessageContent{Text: text},
-	}
 }
 
 // SendMessage takes any type of message and posts to messenger API
@@ -61,22 +51,9 @@ func (c Client) SendMessage(m Message) (MsgResponse, error) {
 	return decode(resp)
 }
 
-// decodeResponse decodes Facebook response after sending message, usually contains MessageID or Error
-func decode(r *http.Response) (MsgResponse, error) {
-	defer r.Body.Close()
-	var res MsgRawResponse
-	err := json.NewDecoder(r.Body).Decode(&res)
-	if err != nil {
-		return MsgResponse{}, err
-	}
-
-	// if the response has an error
-	if res.Error != nil {
-		return MsgResponse{}, errors.New(res.Error.Message)
-	}
-
-	return MsgResponse{
-		MessageID:   res.MessageID,
-		RecipientID: res.RecipientID,
-	}, nil
+// SendTextMessage is a wrapper method that creates a text message type
+// and sends that message for you
+func (c Client) SendTextMessage(recipient int, msg string) {
+	m := c.NewTextMessage(recipient, msg)
+	c.SendMessage(m)
 }

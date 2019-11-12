@@ -19,3 +19,12 @@ type TextMessage struct {
 type textMessageContent struct {
 	Text string `json:"text"`
 }
+
+// NewTextMessage returns a new text message structure
+func (c Client) NewTextMessage(recipientID int, text string) TextMessage {
+	return TextMessage{
+		MessagingType: "UPDATE",
+		Recipient:     recipient{ID: recipientID},
+		Message:       textMessageContent{Text: text},
+	}
+}

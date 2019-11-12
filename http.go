@@ -1,5 +1,11 @@
 package messenger
 
+import (
+	"encoding/json"
+	"errors"
+	"net/http"
+)
+
 // MsgResponse received from Messenger API after sending the message
 type MsgResponse struct {
 	MessageID   string `json:"message_id"`
@@ -21,4 +27,25 @@ type MsgError struct {
 	FbtraceID string `json:"fbtrace_id"`
 	Message   string `json:"message"`
 	Type      string `json:"type"`
+}
+
+// decodes Messenger response after sending message and returns the correct
+// structure based on the response having an error object or not
+func decode(r *http.Response) (MsgResponse, error) {
+	defer r.Body.Close()
+	var res MsgRawResponse
+	err := json.NewDecoder(r.Body).Decode(&res)
+	if err != nil {
+		return MsgResponse{}, err
+	}
+
+	// if the response has an error
+	if res.Error != nil {
+		return MsgResponse{}, errors.New(res.Error.Message)
+	}
+
+	return MsgResponse{
+		MessageID:   res.MessageID,
+		RecipientID: res.RecipientID,
+	}, nil
 }
