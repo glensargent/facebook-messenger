@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// baseURL used for messenger API
-const baseURL = "https://graph.facebook.com/v5.0/me/messages/"
+// BaseURL used for messenger API
+var BaseURL = "https://graph.facebook.com/v5.0/me/messages/"
 
 var httpClient = &http.Client{
 	Timeout: time.Second * 10,
@@ -48,7 +48,7 @@ func (c Client) SendMessage(m Message) (MsgResponse, error) {
 	}
 
 	// construct the post request
-	url := fmt.Sprintf("%v?access_token=%v", baseURL, c.AccessToken)
+	url := fmt.Sprintf("%v?access_token=%v", BaseURL, c.AccessToken)
 	msg, _ := json.Marshal(m)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(msg))
 	req.Header.Set("Content-Type", "application/json")
