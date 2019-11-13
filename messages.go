@@ -35,6 +35,8 @@ type attachment struct {
 }
 type payload struct {
 	TemplateType string    `json:"template_type,omitempty"`
+	Text         string    `json:"text,omitempty"`
+	Buttons      []Button  `json:"buttons,omitempty"`
 	Elements     []Element `json:"elements,omitempty"`
 }
 

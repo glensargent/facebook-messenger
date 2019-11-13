@@ -60,3 +60,33 @@ func TestSendMessage(t *testing.T) {
 		t.Errorf("got %+v wanted %+v", got, expected)
 	}
 }
+
+func TestNewGenericMessage(t *testing.T) {
+	msg := New("access_token", "123")
+
+	expected := GenericMessage{
+		Recipient: recipient{ID: 123},
+		Message: genericMessageContent{
+			Attachment: &attachment{
+				Type:    "template",
+				Payload: payload{TemplateType: "generic"},
+			},
+		},
+	}
+
+	got := msg.NewGenericMessage(123)
+
+	if expected.Recipient != got.Recipient {
+		t.Error("Recipients do not match")
+	}
+
+	if expected.Message.Attachment.Type != got.Message.Attachment.Type {
+		t.Error("Messages do not match")
+	}
+
+	if expected.Message.Attachment.Payload.TemplateType != got.Message.Attachment.Payload.TemplateType {
+		t.Error("Payload template types do not match")
+	}
+}
+
+// Add test for addElement

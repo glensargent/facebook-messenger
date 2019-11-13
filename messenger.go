@@ -12,6 +12,8 @@ import (
 // TO DO:
 // support type: template (payloads that let us send text and buttons)
 // support quick replies
+// make persona api
+// support typing on and off
 
 // BaseURL used for messenger API
 var BaseURL = "https://graph.facebook.com/v5.0/me/messages/"
