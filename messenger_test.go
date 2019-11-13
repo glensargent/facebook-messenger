@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -76,17 +77,54 @@ func TestNewGenericMessage(t *testing.T) {
 
 	got := msg.NewGenericMessage(123)
 
-	if expected.Recipient != got.Recipient {
-		t.Error("Recipients do not match")
-	}
-
-	if expected.Message.Attachment.Type != got.Message.Attachment.Type {
-		t.Error("Messages do not match")
-	}
-
-	if expected.Message.Attachment.Payload.TemplateType != got.Message.Attachment.Payload.TemplateType {
-		t.Error("Payload template types do not match")
+	if !reflect.DeepEqual(expected, got) {
+		t.Errorf("got %+v wanted %+v", got, expected)
 	}
 }
 
-// Add test for addElement
+func TestAddElement(t *testing.T) {
+	msg := New("access_token", "123")
+
+	expected := GenericMessage{
+		Recipient: recipient{ID: 123},
+		Message: genericMessageContent{
+			Attachment: &attachment{
+				Type: "template",
+				Payload: payload{
+					TemplateType: "generic",
+					Elements: []Element{
+						Element{
+							Title:    "Title",
+							ImageURL: "image",
+							Buttons: []Button{
+								Button{
+									Title: "btn title",
+									Type:  "web_url",
+									URL:   "test url",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	got := msg.NewGenericMessage(123)
+	got.AddElement(Element{
+		Title:    "Title",
+		ImageURL: "image",
+		Buttons: []Button{
+			Button{
+				Title: "btn title",
+				Type:  "web_url",
+				URL:   "test url",
+			},
+		},
+	})
+
+	if !reflect.DeepEqual(got.Message.Attachment.Payload.Elements, expected.Message.Attachment.Payload.Elements) {
+		t.Errorf("got %+v wanted %+v", got, expected)
+	}
+
+}
