@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+// TO DO:
+// support type: template (payloads that let us send text and buttons)
+// support quick replies
+
 // BaseURL used for messenger API
 var BaseURL = "https://graph.facebook.com/v5.0/me/messages/"
 
