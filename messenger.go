@@ -32,6 +32,7 @@ func (c Client) SendMessage(m Message) (MsgResponse, error) {
 	// type switch to check that the Message is a supported type
 	switch m.(type) {
 	case TextMessage:
+	case GenericMessage:
 	default:
 		log.Println("Unsupported message type")
 		return MsgResponse{}, nil
