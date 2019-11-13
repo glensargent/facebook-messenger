@@ -20,27 +20,41 @@ type textMessageContent struct {
 	Text string `json:"text"`
 }
 
-// ImageMessage is the structure that represents an image only message
-type ImageMessage struct {
-	MessagingType string     `json:"messaging_type"`
-	Recipient     recipient  `json:"recipient"`
-	Message       attachment `json:"message"`
+// GenericMessage struct used for sending structural messages to messenger (messages with images, links, and buttons)
+type GenericMessage struct {
+	Recipient recipient             `json:"recipient"`
+	Message   genericMessageContent `json:"message"`
+}
+type genericMessageContent struct {
+	Attachment *attachment `json:"attachment,omitempty"`
 }
 
 type attachment struct {
-	ImageAttachment `json:"attachment"`
+	Type    string  `json:"type,omitempty"`
+	Payload payload `json:"payload,omitempty"`
+}
+type payload struct {
+	TemplateType string    `json:"template_type,omitempty"`
+	Elements     []Element `json:"elements,omitempty"`
 }
 
-// ImageAttachment to be redeveloped as being able to attach attachments dynamically..
-type ImageAttachment struct {
-	Type string `json:"type"`
-	// Payload
-	Payload imageAttachmentPayload `json:"payload"`
+// Element in Generic Message template
+// https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic
+type Element struct {
+	Title    string   `json:"title"`
+	Subtitle string   `json:"subtitle,omitempty"`
+	ItemURL  string   `json:"item_url,omitempty"`
+	ImageURL string   `json:"image_url,omitempty"`
+	Buttons  []Button `json:"buttons,omitempty"`
 }
 
-type imageAttachmentPayload struct {
-	URL        string `json:"url"`
-	IsReusable bool   `json:"is_reusable"`
+// Button on Generic Message template element
+// https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic
+type Button struct {
+	Type    string `json:"type"`
+	URL     string `json:"url,omitempty"`
+	Title   string `json:"title"`
+	Payload string `json:"payload,omitempty"`
 }
 
 // NewTextMessage returns a new text message structure
@@ -52,19 +66,22 @@ func (c Client) NewTextMessage(recipientID int, text string) TextMessage {
 	}
 }
 
-// NewImageMessage returns a new image message
-func (c Client) NewImageMessage(recipientID int, imgURL string) ImageMessage {
-	return ImageMessage{
-		MessagingType: "UPDATE",
-		Recipient:     recipient{ID: recipientID},
-		Message: attachment{
-			ImageAttachment{
-				Type: "image",
-				Payload: imageAttachmentPayload{
-					URL:        imgURL,
-					IsReusable: true,
-				},
+// NewGenericMessage creates new Generic Template message that's used for attaching other elements such as images, links, buttons etc
+// https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic
+func (c Client) NewGenericMessage(recipientID int) GenericMessage {
+	return GenericMessage{
+		Recipient: recipient{ID: recipientID},
+		Message: genericMessageContent{
+			Attachment: &attachment{
+				Type:    "template",
+				Payload: payload{TemplateType: "generic"},
 			},
 		},
 	}
+}
+
+// AddElement adds a new element to the message object
+// https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic
+func (m *GenericMessage) AddElement(e Element) {
+	m.Message.Attachment.Payload.Elements = append(m.Message.Attachment.Payload.Elements, e)
 }

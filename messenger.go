@@ -32,7 +32,6 @@ func (c Client) SendMessage(m Message) (MsgResponse, error) {
 	// type switch to check that the Message is a supported type
 	switch m.(type) {
 	case TextMessage:
-	case ImageMessage:
 	default:
 		log.Println("Unsupported message type")
 		return MsgResponse{}, nil
@@ -65,13 +64,13 @@ func (c Client) SendTextMessage(recipient int, msg string) (MsgResponse, error) 
 }
 
 // SendImageMessage takes an image URL and sends that to the user as an image only message
-func (c Client) SendImageMessage(recipient int, imgURL string) (MsgResponse, error) {
-	// return MsgResponse{}, nil
-	m := c.NewImageMessage(recipient, imgURL)
-	res, err := c.SendMessage(m)
-	if err != nil {
-		return MsgResponse{}, err
-	}
+// func (c Client) SendImageMessage(recipient int, imgURL string) (MsgResponse, error) {
+// 	// return MsgResponse{}, nil
+// 	m := c.NewImageMessage(recipient, imgURL)
+// 	res, err := c.SendMessage(m)
+// 	if err != nil {
+// 		return MsgResponse{}, err
+// 	}
 
-	return res, nil
-}
+// 	return res, nil
+// }
