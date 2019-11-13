@@ -53,7 +53,12 @@ func (c Client) SendMessage(m Message) (MsgResponse, error) {
 
 // SendTextMessage is a wrapper method that creates a text message type
 // and sends that message for you
-func (c Client) SendTextMessage(recipient int, msg string) {
+func (c Client) SendTextMessage(recipient int, msg string) (MsgResponse, error) {
 	m := c.NewTextMessage(recipient, msg)
-	c.SendMessage(m)
+	res, err := c.SendMessage(m)
+	if err != nil {
+		return MsgResponse{}, err
+	}
+
+	return res, nil
 }
