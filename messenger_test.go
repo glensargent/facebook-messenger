@@ -30,38 +30,6 @@ func TestNewTextMessage(t *testing.T) {
 	}
 }
 
-func TestSendMessage(t *testing.T) {
-	// fs will mock up fb messenger server
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rec := MsgResponse{
-			RecipientID: 123,
-			MessageID:   "TEST123",
-		}
-		b, _ := json.Marshal(rec)
-		w.Write(b)
-	}))
-	defer server.Close()
-
-	BaseURL = server.URL
-
-	client := New("123", "456")
-	m := client.NewTextMessage(123, "test")
-	got, err := client.SendMessage(m)
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	expected := MsgResponse{
-		MessageID:   "TEST123",
-		RecipientID: 123,
-	}
-
-	if got != expected {
-		t.Errorf("got %+v wanted %+v", got, expected)
-	}
-}
-
 func TestNewGenericMessage(t *testing.T) {
 	msg := New("access_token", "123")
 
@@ -126,5 +94,67 @@ func TestAddElement(t *testing.T) {
 	if !reflect.DeepEqual(got.Message.Attachment.Payload.Elements, expected.Message.Attachment.Payload.Elements) {
 		t.Errorf("got %+v wanted %+v", got, expected)
 	}
+}
 
+func TestAddQuickReply(t *testing.T) {
+	msg := New("access_token", "123")
+	got := msg.NewGenericMessage(123)
+	got.AddQuickReply(QuickReply{
+		ContentType: "text",
+		Title:       "Yes",
+		Payload:     []byte("test"),
+	})
+
+	expected := GenericMessage{
+		Recipient: recipient{ID: 123},
+		Message: genericMessageContent{
+			Attachment: &attachment{
+				Type:    "template",
+				Payload: payload{TemplateType: "generic"},
+			},
+			QuickReplies: []QuickReply{
+				QuickReply{
+					ContentType: "text",
+					Title:       "Yes",
+					Payload:     []byte("test"),
+				},
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Errorf("got %+v wanted %+v", got, expected)
+	}
+}
+
+func TestSendMessage(t *testing.T) {
+	// fs will mock up fb messenger server
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rec := MsgResponse{
+			RecipientID: 123,
+			MessageID:   "TEST123",
+		}
+		b, _ := json.Marshal(rec)
+		w.Write(b)
+	}))
+	defer server.Close()
+
+	BaseURL = server.URL
+
+	client := New("123", "456")
+	m := client.NewTextMessage(123, "test")
+	got, err := client.SendMessage(m)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	expected := MsgResponse{
+		MessageID:   "TEST123",
+		RecipientID: 123,
+	}
+
+	if got != expected {
+		t.Errorf("got %+v wanted %+v", got, expected)
+	}
 }

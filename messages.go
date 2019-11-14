@@ -26,7 +26,17 @@ type GenericMessage struct {
 	Message   genericMessageContent `json:"message"`
 }
 type genericMessageContent struct {
-	Attachment *attachment `json:"attachment,omitempty"`
+	Text         string       `json:"text"`
+	Attachment   *attachment  `json:"attachment,omitempty"`
+	QuickReplies []QuickReply `json:"quick_replies,omitempty"`
+}
+
+// QuickReply is a suggested reply offered to the user that can carry a payload
+type QuickReply struct {
+	ContentType string `json:"content_type"`
+	Title       string `json:"title,omitempty"`
+	ImageURL    string `json:"image_url,omitempty"`
+	Payload     []byte `json:"payload,omitempty"`
 }
 
 type attachment struct {
@@ -59,6 +69,9 @@ type Button struct {
 	Payload string `json:"payload,omitempty"`
 }
 
+// Add support for:
+// Quick replies, Typing & Personas
+
 // NewTextMessage returns a new text message structure
 func (c Client) NewTextMessage(recipientID int, text string) TextMessage {
 	return TextMessage{
@@ -86,4 +99,10 @@ func (c Client) NewGenericMessage(recipientID int) GenericMessage {
 // https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic
 func (m *GenericMessage) AddElement(e Element) {
 	m.Message.Attachment.Payload.Elements = append(m.Message.Attachment.Payload.Elements, e)
+}
+
+// AddQuickReply adds a new quick reply to the message object, for info about content types, see here:
+// https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies
+func (m *GenericMessage) AddQuickReply(q QuickReply) {
+	m.Message.QuickReplies = append(m.Message.QuickReplies, q)
 }
