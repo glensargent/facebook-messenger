@@ -14,6 +14,7 @@ const (
 type SenderAction struct {
 	Recipient recipient `json:"recipient"`
 	Action    string    `json:"sender_action"`
+	PersonaID string    `json:"persona_id,omitempty"`
 }
 
 // NewAction creates a new user action
@@ -55,4 +56,9 @@ func (c Client) MarkSeen(recipientID int) (MsgResponse, error) {
 	}
 
 	return res, nil
+}
+
+// AddPersona adds a persona ID to an action
+func (s *SenderAction) AddPersona(personaID string) {
+	s.PersonaID = personaID
 }

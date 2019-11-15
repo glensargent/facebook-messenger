@@ -29,6 +29,11 @@ type MsgError struct {
 	Type      string `json:"type"`
 }
 
+// PersonaResponse represents the response object returned when getting all personas
+type PersonaResponse struct {
+	Data []Persona `json:"data,omitempty"`
+}
+
 // decodes Messenger response after sending message and returns the correct
 // structure based on the response having an error object or not
 func decode(r *http.Response) (MsgResponse, error) {

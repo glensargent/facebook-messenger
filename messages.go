@@ -14,6 +14,7 @@ type TextMessage struct {
 	MessagingType string             `json:"messaging_type"`
 	Recipient     recipient          `json:"recipient"`
 	Message       textMessageContent `json:"message"`
+	PersonaID     string             `json:"persona_id,omitempty"`
 }
 
 type textMessageContent struct {
@@ -24,6 +25,7 @@ type textMessageContent struct {
 type GenericMessage struct {
 	Recipient recipient             `json:"recipient"`
 	Message   genericMessageContent `json:"message"`
+	PersonaID string                `json:"persona_id,omitempty"`
 }
 type genericMessageContent struct {
 	Text         string       `json:"text"`
@@ -105,4 +107,14 @@ func (m *GenericMessage) AddElement(e Element) {
 // https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies
 func (m *GenericMessage) AddQuickReply(q QuickReply) {
 	m.Message.QuickReplies = append(m.Message.QuickReplies, q)
+}
+
+// AddPersona adds a persona ID to a message
+func (m *GenericMessage) AddPersona(personaID string) {
+	m.PersonaID = personaID
+}
+
+// AddPersona adds a persona ID to a message
+func (m *TextMessage) AddPersona(personaID string) {
+	m.PersonaID = personaID
 }
