@@ -58,6 +58,22 @@ func (c Client) SendMessage(m Message) (MsgResponse, error) {
 	return decode(resp)
 }
 
+// SendAction takes any type of message and posts to messenger API
+func (c Client) SendAction(action SenderAction) (MsgResponse, error) {
+	// construct the post request
+	url := fmt.Sprintf("%v?access_token=%v", BaseURL, c.AccessToken)
+	msg, _ := json.Marshal(action)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(msg))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return MsgResponse{}, err
+	}
+
+	return decode(resp)
+}
+
 // SendTextMessage is a wrapper method that creates a text message type
 // and sends that message for you
 func (c Client) SendTextMessage(recipient int, msg string) (MsgResponse, error) {
@@ -69,15 +85,3 @@ func (c Client) SendTextMessage(recipient int, msg string) (MsgResponse, error) 
 
 	return res, nil
 }
-
-// SendImageMessage takes an image URL and sends that to the user as an image only message
-// func (c Client) SendImageMessage(recipient int, imgURL string) (MsgResponse, error) {
-// 	// return MsgResponse{}, nil
-// 	m := c.NewImageMessage(recipient, imgURL)
-// 	res, err := c.SendMessage(m)
-// 	if err != nil {
-// 		return MsgResponse{}, err
-// 	}
-
-// 	return res, nil
-// }
