@@ -8,6 +8,10 @@ import (
 	"testing"
 )
 
+// To Do:
+// Add tests for personas
+// Add tests for actions
+
 func TestNewClient(t *testing.T) {
 	got := New("123", "456")
 	want := Client{"123", "456"}
